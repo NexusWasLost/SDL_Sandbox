@@ -20,7 +20,8 @@ int main(int argc, char* argv[]){
 
     //pause the window for 5 sec
     // SDL_Delay(5000);
-    int eventCount = 0;
+    int mouseMoveCount = 0;
+
     bool windowIsRunning = true;
     while(windowIsRunning){
         SDL_Event event;
@@ -30,8 +31,16 @@ int main(int argc, char* argv[]){
             if(event.type == SDL_QUIT){
                 windowIsRunning = false;
             }
-            eventCount++;
-            std::cout << "Event: " << eventCount  << ", Event Type: " << event.type << "\n";
+            // if(event.type == SDL_MOUSEMOTION){
+            //     mouseMoveCount++;
+            //     std::cout << "Mouse has been moved for " << mouseMoveCount << " times\n";
+            // }
+            if(event.type == SDL_KEYDOWN){
+                if(event.key.keysym.scancode == SDL_SCANCODE_B)
+                    std::cout << "'B' key was pressed\n";
+                else
+                    std::cout << "A key was pressed but it is was B\n";
+            }
         }
     }
 
