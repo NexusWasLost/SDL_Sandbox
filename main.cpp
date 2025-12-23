@@ -41,9 +41,10 @@ int main(int argc, char* argv[]){
 
                 int numkeys;
                 const Uint8* state = SDL_GetKeyboardState(&numkeys);
-                std::cout << static_cast<int>(*state) << ", total keys: "<< numkeys << "\n";
-                state += 4; //returns 1 if key 'A' is pressed since 4th index is SDL_SCANCODE_A
-                std::cout << static_cast<int>(*state) << ", total keys: "<< numkeys << "\n";
+                //check if space bar is pressed (state[code] stores 1 if pressed or 0 if not)
+                if(state[SDL_SCANCODE_SPACE]){
+                    std::cout << "SpaceBar is pressed !\n";
+                }
             }
         }
     }
