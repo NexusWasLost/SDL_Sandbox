@@ -3,6 +3,7 @@
 
 void printKey(SDL_Scancode scancode);
 void renderStuff(SDL_Renderer* renderer);
+void displayRendererInfo(SDL_Renderer* renderer);
 void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 int main(int argc, char* argv[]){
@@ -24,6 +25,8 @@ int main(int argc, char* argv[]){
 
     //create the renderer
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    //prints the info (name) of the graphics API context used.
+    displayRendererInfo(renderer);
     renderStuff(renderer);
 
     bool windowIsRunning = true;
@@ -55,6 +58,17 @@ void printKey(SDL_Scancode scancode) {
     SDL_Keycode k = SDL_GetKeyFromScancode(scancode);
     const char* pressedKey = SDL_GetKeyName(k);
     std::cout << pressedKey << "\n";
+}
+
+void displayRendererInfo(SDL_Renderer* renderer){
+    SDL_RendererInfo r_info;
+    int info = SDL_GetRendererInfo(renderer, &r_info);
+    if(info < 0){
+        std::cout << "SDL Error fetching Renderer Info: " << SDL_GetError();
+        return;
+    }
+
+    std::cout << r_info.name << "\n";
 }
 
 void renderStuff(SDL_Renderer* renderer){
