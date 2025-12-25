@@ -2,6 +2,8 @@
 #include <SDL2/SDL.h>
 
 void printKey(SDL_Scancode scancode);
+void renderStuff(SDL_Renderer* renderer);
+void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 int main(int argc, char* argv[]){
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -20,9 +22,9 @@ int main(int argc, char* argv[]){
         SDL_WINDOW_SHOWN
     );
 
-    //pause the window for 5 sec
-    // SDL_Delay(5000);
-    int mouseMoveCount = 0;
+    //create the renderer
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    renderStuff(renderer);
 
     bool windowIsRunning = true;
     while(windowIsRunning){
@@ -34,26 +36,14 @@ int main(int argc, char* argv[]){
                 windowIsRunning = false;
             }
             if(event.type == SDL_KEYDOWN){
-                // std::cout << event.key.keysym.scancode << "\n";
                 SDL_Scancode code = event.key.keysym.scancode;
                 printKey(code);
-                // if(event.key.keysym.scancode == SDL_SCANCODE_B){
-                //     std::cout << "'B' key was pressed\n";
-                // }
-                // else{
-                //     std::cout << "A key was pressed but it is was B\n";
-                // }
-
-                // int numkeys;
-                // const Uint8* state = SDL_GetKeyboardState(&numkeys);
-                // //check if space bar is pressed (state[code] stores 1 if pressed or 0 if not)
-                // if(state[SDL_SCANCODE_SPACE]){
-                //     std::cout << "SpaceBar is pressed !\n";
-                // }
             }
         }
     }
 
+    //destroy the renderer
+    SDL_DestroyRenderer(renderer);
     //destroy the window
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -65,4 +55,33 @@ void printKey(SDL_Scancode scancode) {
     SDL_Keycode k = SDL_GetKeyFromScancode(scancode);
     const char* pressedKey = SDL_GetKeyName(k);
     std::cout << pressedKey << "\n";
+}
+
+void renderStuff(SDL_Renderer* renderer){
+    setBrushColor(renderer, 255, 0, 0, 255);
+
+    //clear the rendering target with drawing color
+    int clear = SDL_RenderClear(renderer);
+    if(clear < 0){
+        std::cout << "SDL Clear failed failed: " << SDL_GetError();
+    }
+
+    //change the brush color to draw the line
+    setBrushColor(renderer, 255, 255, 255, 255);
+
+    int lineDrew = SDL_RenderDrawLine(renderer, 0, 0, 200, 200);
+    if(lineDrew < 0){
+        std::cout << "SDL Failed to Draw Line: " << SDL_GetError();
+    }
+    // SDL_RenderPresent(renderer);
+    //update the window with the rendering color
+    SDL_RenderPresent(renderer);
+}
+
+void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a){
+    int brushSetSuccess = SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    if(brushSetSuccess < 0){
+        std::cout << "SDL Render Color Setting failed: " << SDL_GetError();
+        return;
+    }
 }
