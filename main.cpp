@@ -6,6 +6,11 @@ void renderStuff(SDL_Renderer* renderer);
 void displayRendererInfo(SDL_Renderer* renderer);
 void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
+//shape drawing functions
+void drawLine(SDL_Renderer* renderer);
+void drawHollowRect(SDL_Renderer* renderer);
+void drawFilledRect(SDL_Renderer* renderer);
+
 int main(int argc, char* argv[]){
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
         std::cout << "SDL could not be initialized: " << SDL_GetError();
@@ -83,12 +88,11 @@ void renderStuff(SDL_Renderer* renderer){
     //change the brush color to draw the line
     setBrushColor(renderer, 255, 255, 255, 255);
 
-    int lineDrew = SDL_RenderDrawLine(renderer, 0, 0, 200, 200);
-    if(lineDrew < 0){
-        std::cout << "SDL Failed to Draw Line: " << SDL_GetError();
-    }
-    // SDL_RenderPresent(renderer);
-    //update the window with the rendering color
+    // drawLine(renderer);
+    drawHollowRect(renderer);
+    drawFilledRect(renderer);
+
+    //update the window
     SDL_RenderPresent(renderer);
 }
 
@@ -96,6 +100,45 @@ void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a){
     int brushSetSuccess = SDL_SetRenderDrawColor(renderer, r, g, b, a);
     if(brushSetSuccess < 0){
         std::cout << "SDL Render Color Setting failed: " << SDL_GetError();
+        return;
+    }
+}
+
+//shape drawing functions
+void drawLine(SDL_Renderer* renderer){
+    //draw line
+    int lineDrew = SDL_RenderDrawLine(renderer, 0, 0, 200, 200);
+    if(lineDrew < 0){
+        std::cout << "SDL Failed to Draw Line: " << SDL_GetError();
+    }
+}
+
+void drawHollowRect(SDL_Renderer* renderer){
+    //draw rectangle
+    SDL_Rect rect;
+    rect.x = 15;
+    rect.y = 15;
+    rect. w = 500;
+    rect.h = 300;
+
+    int rectDrew = SDL_RenderDrawRect(renderer, &rect);
+    if(rectDrew < 0){
+        std::cout << "SDL Failed to Draw Rectangle: " << SDL_GetError();
+        return;
+    }
+}
+
+void drawFilledRect(SDL_Renderer* renderer){
+    //draw filled rectangle
+    SDL_Rect filledRect;
+    filledRect.x = 60;
+    filledRect.y = 60;
+    filledRect. w = 400;
+    filledRect.h = 200;
+
+    int rectDrew = SDL_RenderFillRect(renderer, &filledRect);
+    if(rectDrew < 0){
+        std::cout << "SDL Failed to Draw Filled Rectangle: " << SDL_GetError();
         return;
     }
 }
