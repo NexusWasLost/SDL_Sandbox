@@ -62,6 +62,7 @@ int main(int argc, char* argv[]){
 }
 
 void printKey(SDL_Scancode scancode) {
-    const char pressedKey = SDL_GetKeyFromScancode(scancode);
+    SDL_Keycode k = SDL_GetKeyFromScancode(scancode);
+    const char* pressedKey = SDL_GetKeyName(k);
     std::cout << pressedKey << "\n";
 }
