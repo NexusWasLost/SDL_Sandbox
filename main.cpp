@@ -2,14 +2,14 @@
 #include <SDL2/SDL.h>
 
 void printKey(SDL_Scancode scancode);
-void renderStuff(SDL_Renderer* renderer);
+void renderStuff(SDL_Renderer* renderer, int x, int y);
 void displayRendererInfo(SDL_Renderer* renderer);
 void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 //shape drawing functions
-void drawLine(SDL_Renderer* renderer);
-void drawHollowRect(SDL_Renderer* renderer);
-void drawFilledRect(SDL_Renderer* renderer);
+void drawLine(SDL_Renderer* renderer, int x1, int y1, int x2, int y2);
+void drawHollowRect(SDL_Renderer* renderer, int x, int y, int w, int h);
+void drawFilledRect(SDL_Renderer* renderer, int x, int y, int w, int h);
 
 int main(int argc, char* argv[]){
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -23,8 +23,8 @@ int main(int argc, char* argv[]){
         "Base SDL Window",
         150,
         150,
-        640,
-        480,
+        1280,
+        720,
         SDL_WINDOW_SHOWN
     );
 
@@ -32,7 +32,9 @@ int main(int argc, char* argv[]){
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     //prints the info (name) of the graphics API context used.
     displayRendererInfo(renderer);
-    renderStuff(renderer);
+
+    //basic rectangle dimensions
+    int rectX = 525, rectY = 250;
 
     bool windowIsRunning = true;
     while(windowIsRunning){
@@ -46,8 +48,24 @@ int main(int argc, char* argv[]){
             if(event.type == SDL_KEYDOWN){
                 SDL_Scancode code = event.key.keysym.scancode;
                 printKey(code);
+
+                //move the rectangle depending on arrows
+                if(code == SDL_SCANCODE_W){
+                    rectY -= 20;
+                }
+                else if(code == SDL_SCANCODE_S){
+                    rectY += 20;
+                }
+                else if(code == SDL_SCANCODE_A){
+                    rectX -= 20;
+                }
+                else if(code == SDL_SCANCODE_D){
+                    rectX += 20;
+                }
             }
         }
+        //render frames each iteration
+        renderStuff(renderer, rectX, rectY);
     }
 
     //destroy the renderer
@@ -76,8 +94,8 @@ void displayRendererInfo(SDL_Renderer* renderer){
     std::cout << r_info.name << "\n";
 }
 
-void renderStuff(SDL_Renderer* renderer){
-    setBrushColor(renderer, 255, 0, 0, 255);
+void renderStuff(SDL_Renderer* renderer, int x, int y){
+    setBrushColor(renderer, 0, 255, 0, 255);
 
     //clear the rendering target with drawing color
     int clear = SDL_RenderClear(renderer);
@@ -85,12 +103,17 @@ void renderStuff(SDL_Renderer* renderer){
         std::cout << "SDL Clear failed failed: " << SDL_GetError();
     }
 
-    //change the brush color to draw the line
     setBrushColor(renderer, 255, 255, 255, 255);
 
-    // drawLine(renderer);
-    drawHollowRect(renderer);
-    drawFilledRect(renderer);
+    //draw a simple square
+    // int x = 0, y = 0, w = 0, h = 0;
+    // std::cout << "Enter the dimensions of the rectangle to draw: \n";
+    // std::cin >> x;
+    // std::cin >> y;
+    // std::cin >> w;
+    // std::cin >> h;
+    int w = 100, h = 100;
+    drawFilledRect(renderer, x, y, w, h);
 
     //update the window
     SDL_RenderPresent(renderer);
@@ -105,21 +128,21 @@ void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a){
 }
 
 //shape drawing functions
-void drawLine(SDL_Renderer* renderer){
+void drawLine(SDL_Renderer* renderer, int x1, int y1, int x2, int y2){
     //draw line
-    int lineDrew = SDL_RenderDrawLine(renderer, 0, 0, 200, 200);
+    int lineDrew = SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     if(lineDrew < 0){
         std::cout << "SDL Failed to Draw Line: " << SDL_GetError();
     }
 }
 
-void drawHollowRect(SDL_Renderer* renderer){
+void drawHollowRect(SDL_Renderer* renderer, int x, int y, int w, int h){
     //draw rectangle
     SDL_Rect rect;
-    rect.x = 15;
-    rect.y = 15;
-    rect. w = 500;
-    rect.h = 300;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
 
     int rectDrew = SDL_RenderDrawRect(renderer, &rect);
     if(rectDrew < 0){
@@ -128,13 +151,13 @@ void drawHollowRect(SDL_Renderer* renderer){
     }
 }
 
-void drawFilledRect(SDL_Renderer* renderer){
+void drawFilledRect(SDL_Renderer* renderer, int x, int y, int w, int h){
     //draw filled rectangle
     SDL_Rect filledRect;
-    filledRect.x = 60;
-    filledRect.y = 60;
-    filledRect. w = 400;
-    filledRect.h = 200;
+    filledRect.x = x;
+    filledRect.y = y;
+    filledRect.w = w;
+    filledRect.h = h;
 
     int rectDrew = SDL_RenderFillRect(renderer, &filledRect);
     if(rectDrew < 0){
