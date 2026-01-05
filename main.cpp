@@ -1,6 +1,12 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
+#define WINDOW_MAX_WIDTH 1280
+#define WINDOW_MAX_HEIGHT 720
+#define BOX_WIDTH 100
+#define BOX_HEIGHT 100
+#define FRAMERATE_CAP 60
+
 void printKey(SDL_Scancode scancode);
 void renderStuff(SDL_Renderer* renderer, int x, int y);
 void displayRendererInfo(SDL_Renderer* renderer);
@@ -8,8 +14,14 @@ void setBrushColor(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 //shape drawing functions
 void drawLine(SDL_Renderer* renderer, int x1, int y1, int x2, int y2);
-void drawHollowRect(SDL_Renderer* renderer, int x, int y, int w, int h);
-void drawFilledRect(SDL_Renderer* renderer, int x, int y, int w, int h);
+void drawHollowRect(SDL_Renderer* renderer, int x, int y);
+void drawFilledRect(SDL_Renderer* renderer, int x, int y);
+
+//direction based collision detection
+bool upCollision(int y);
+bool downCollision(int y);
+bool leftCollision(int x);
+bool rightCollision(int x);
 
 int main(int argc, char* argv[]){
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -23,8 +35,8 @@ int main(int argc, char* argv[]){
         "Base SDL Window",
         150,
         150,
-        1280,
-        720,
+        WINDOW_MAX_WIDTH,
+        WINDOW_MAX_HEIGHT,
         SDL_WINDOW_SHOWN
     );
 
@@ -50,16 +62,16 @@ int main(int argc, char* argv[]){
                 printKey(code);
 
                 //move the rectangle depending on arrows
-                if(code == SDL_SCANCODE_W){
+                if(code == SDL_SCANCODE_W && !upCollision(rectY)){
                     rectY -= 20;
                 }
-                else if(code == SDL_SCANCODE_S){
+                else if(code == SDL_SCANCODE_S && !downCollision(rectY)){
                     rectY += 20;
                 }
-                else if(code == SDL_SCANCODE_A){
+                else if(code == SDL_SCANCODE_A && !leftCollision(rectX)){
                     rectX -= 20;
                 }
-                else if(code == SDL_SCANCODE_D){
+                else if(code == SDL_SCANCODE_D && !rightCollision(rectX)){
                     rectX += 20;
                 }
             }
@@ -105,15 +117,7 @@ void renderStuff(SDL_Renderer* renderer, int x, int y){
 
     setBrushColor(renderer, 255, 255, 255, 255);
 
-    //draw a simple square
-    // int x = 0, y = 0, w = 0, h = 0;
-    // std::cout << "Enter the dimensions of the rectangle to draw: \n";
-    // std::cin >> x;
-    // std::cin >> y;
-    // std::cin >> w;
-    // std::cin >> h;
-    int w = 100, h = 100;
-    drawFilledRect(renderer, x, y, w, h);
+    drawFilledRect(renderer, x, y);
 
     //update the window
     SDL_RenderPresent(renderer);
@@ -136,13 +140,13 @@ void drawLine(SDL_Renderer* renderer, int x1, int y1, int x2, int y2){
     }
 }
 
-void drawHollowRect(SDL_Renderer* renderer, int x, int y, int w, int h){
+void drawHollowRect(SDL_Renderer* renderer, int x, int y){
     //draw rectangle
     SDL_Rect rect;
     rect.x = x;
     rect.y = y;
-    rect.w = w;
-    rect.h = h;
+    rect.w = BOX_WIDTH;
+    rect.h = BOX_HEIGHT;
 
     int rectDrew = SDL_RenderDrawRect(renderer, &rect);
     if(rectDrew < 0){
@@ -151,17 +155,45 @@ void drawHollowRect(SDL_Renderer* renderer, int x, int y, int w, int h){
     }
 }
 
-void drawFilledRect(SDL_Renderer* renderer, int x, int y, int w, int h){
+void drawFilledRect(SDL_Renderer* renderer, int x, int y){
     //draw filled rectangle
     SDL_Rect filledRect;
     filledRect.x = x;
     filledRect.y = y;
-    filledRect.w = w;
-    filledRect.h = h;
+    filledRect.w = BOX_WIDTH;
+    filledRect.h = BOX_HEIGHT;
 
     int rectDrew = SDL_RenderFillRect(renderer, &filledRect);
     if(rectDrew < 0){
         std::cout << "SDL Failed to Draw Filled Rectangle: " << SDL_GetError();
         return;
     }
+}
+
+bool upCollision(int y){
+    if(y <= 0){
+        return true;
+    }
+    return false;
+}
+
+bool downCollision(int y){
+    if(y + BOX_HEIGHT >= WINDOW_MAX_HEIGHT){
+        return true;
+    }
+    return false;
+}
+
+bool leftCollision(int x){
+    if(x <= 0){
+        return true;
+    }
+    return false;
+}
+
+bool rightCollision(int x){
+    if(x + BOX_WIDTH >= WINDOW_MAX_WIDTH){
+        return true;
+    }
+    return false;
 }
