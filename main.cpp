@@ -7,7 +7,7 @@
 #define BOX_HEIGHT 100
 #define FRAMERATE_CAP 60
 
-Uint32 const frametime = 1000/FRAMERATE_CAP;
+float const target_frametime = 1000/FRAMERATE_CAP;
 
 void printKey(SDL_Scancode scancode);
 void renderStuff(SDL_Renderer* renderer, int x, int y);
@@ -85,10 +85,10 @@ int main(int argc, char* argv[]){
         renderStuff(renderer, rectX, rectY);
 
         //get the time of how long it took to render a frame (currentTime - frameStart)
-        Uint32 workTime = SDL_GetTicks() - framestart;
+        Uint32 actual_frametime = SDL_GetTicks() - framestart;
         //When done we check if the application took less than our designated time (16.6ms) if yes we wait for the rest of the time
-        if(workTime <= frametime){
-            SDL_Delay(frametime - workTime);
+        if(actual_frametime <= target_frametime){
+            SDL_Delay(target_frametime - actual_frametime);
         }
     }
 
